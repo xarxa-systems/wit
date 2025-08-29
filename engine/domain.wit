@@ -1,4 +1,4 @@
-package engine:api@0.1.0;
+package xarxa:engine@0.1.0;
 
 interface engine-types {
     variant value {
