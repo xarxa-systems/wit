@@ -1,26 +1,28 @@
 package xarxa:engine@0.1.0;
 
-interface worker-handler {
+interface workflow-handler {
     use engine-types.{kvpair, workflow-run, workflow-error, run-id, history, signal};
 
-    /// Start a new workflow from scratch. Passes the name of the workflow and input data. 
-    /// The history here is always empty.
-    start-workflow: func(workflow-name: string, input: list<kvpair>) -> result<workflow-run, workflow-error>;
+    resource engine {
+        /// Start a new workflow from scratch. Passes the name of the workflow and input data. 
+        /// The history here is always empty.
+        start-workflow: func(workflow-name: string, input: list<kvpair>) -> result<workflow-run, workflow-error>;
 
-    /// Continue to execute a “asleep” workflow. This is the most frequent command.
-    /// Transfers the entire event history so that SDK can execute replay.
-    continue-workflow: func(id: run-id, history: history) -> result<string, workflow-error>;
+        /// Continue to execute a “asleep” workflow. This is the most frequent command.
+        /// Transfers the entire event history so that SDK can execute replay.
+        continue-workflow: func(id: run-id, history: history) -> result<string, workflow-error>;
 
-    /// Execute a specific function-activity. Passes the name of the activity and its input data. 
-    /// This command is “dumb”, it does not deal with the replay logic.
-    execute-activity: func(activity-name: string, input: list<kvpair>) -> result<string, string>;
+        /// Execute a specific function-activity. Passes the name of the activity and its input data. 
+        /// This command is “dumb”, it does not deal with the replay logic.
+        execute-activity: func(activity-name: string, input: list<kvpair>) -> result<string, string>;
 
-    /// “Push” the signal into the workflow. Passes the name of the signal and its payload.
-    signal-workflow: func(id: run-id, signal: signal) -> result<string, workflow-error>;
+        /// “Push” the signal into the workflow. Passes the name of the signal and its payload.
+        signal-workflow: func(id: run-id, signal: signal) -> result<string, workflow-error>;
 
-    /// Notify the running workflow of a cancel request.
-    /// This is essentially just sending a predefined internal __cancel signal.
-    cancel-workflow: func(id: run-id) -> result<string, workflow-error>;
+        /// Notify the running workflow of a cancel request.
+        /// This is essentially just sending a predefined internal __cancel signal.
+        cancel-workflow: func(id: run-id) -> result<string, workflow-error>;
+    }
 }
 
 interface host-controller {
