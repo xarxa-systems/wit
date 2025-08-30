@@ -1,6 +1,0 @@
-package xarxa:engine@0.1.0;
-
-world controller {
-    export workflow-handler;
-    import host-controller;
-}
