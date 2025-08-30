@@ -131,3 +131,11 @@ interface database {
     insert-record: func(data: record) -> result<u64, db-error>;
 }
 ```
+
+### Generate bindings for Rust
+```bash
+wit-bindgen rust \
+  --out-dir src/bindings \
+  --world orchestrator \
+  wit/orchestrator
+```

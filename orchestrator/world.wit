@@ -1,9 +1,15 @@
-package xarxa:engine@0.1.0;
+package xarxa:api@0.1.1;
 
-interface workflow-handler {
+world orchestrator {
+    export workflow-ctrl;
+    import host-controller;
+}
+
+interface workflow-ctrl {
     use engine-types.{kvpair, workflow-run, workflow-error, run-id, history, signal};
 
-    resource engine {
+    resource workflow-engine {
+        constructor();
         /// Start a new workflow from scratch. Passes the name of the workflow and input data. 
         /// The history here is always empty.
         start-workflow: func(workflow-name: string, input: list<kvpair>) -> result<workflow-run, workflow-error>;
@@ -23,10 +29,63 @@ interface workflow-handler {
         /// This is essentially just sending a predefined internal __cancel signal.
         cancel-workflow: func(id: run-id) -> result<string, workflow-error>;
     }
+
+    create-workflow-engine: func() -> workflow-engine;
 }
 
 interface host-controller {
     use engine-types.{kvpair, run-id};
 
     send-result: func(id: run-id, task-result: kvpair) -> result<string, string>;
+}
+
+interface engine-types {
+    variant value {
+        none,
+        str(string),
+        int64(s64),
+        uint64(u64),
+        float64(f64),
+        boolean(bool),
+        any(list<u8>),
+    }
+
+    record kvpair {
+        key: string,
+        value: value,
+    }
+
+    type run-id = u64;
+
+    type unixtime = u64;
+
+    record workflow-run {
+        id: run-id,
+        input: list<kvpair>,
+        timestamp: unixtime,
+    }
+
+    enum code {
+        not-found,
+        empty-input,
+    }
+
+    record workflow-error {
+        err: string,
+        code: code,
+    }
+
+    record history {
+        tasks-result: list<kvpair>
+    }
+
+    record signal {
+        payload: list<kvpair>
+    }
+
+    record workflow-info {
+        name: string,
+        version: string,
+        description: string,
+    }
 }
