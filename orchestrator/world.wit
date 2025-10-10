@@ -1,12 +1,14 @@
-package xarxa:api@0.1.1;
+package xarxa:api@0.3.0;
 
 world orchestrator {
     export workflow-ctrl;
-    import host-controller;
+
+    import logger;
+    import custom-http;
 }
 
 interface workflow-ctrl {
-    use engine-types.{kvpair, workflow-run, workflow-error, run-id, history, signal};
+    use engine-types.{kvpair, workflow-run, workflow-error, run-id};
 
     start-workflow: func(workflow-name: string, input: list<u8>) -> result<workflow-run, workflow-error>;
     continue-workflow: func(id: run-id, state: list<u8>) -> result<list<u8>, workflow-error>;
@@ -37,12 +39,33 @@ interface workflow-ctrl {
 }
 
 interface host-controller {
-    use engine-types.{kvpair, run-id};
+    use engine-types.{run-id};
 
-    send-result: func(id: run-id, task-result: kvpair) -> result<string, string>;
+    send-result: func(id: run-id, data: list<u8>);
+}
 
-    /// New method. 
-    http-request: func(url: string, body: list<u8>) -> result<list<u8>, string>;
+interface custom-http {
+    use http-types.{header, method};
+
+    http-request: func(headers: list<header>, method: method, url: string, body: list<u8>) -> result<list<u8>, string>;
+}
+
+interface logger {
+    use engine-types.{run-id};
+
+    logging: func(msg: list<u8>);
+}
+
+interface http-types {
+    enum method {
+        get,
+        post,
+    }
+
+    record header {
+        key: string,
+        value: string,
+    }
 }
 
 interface engine-types {
@@ -79,19 +102,5 @@ interface engine-types {
     record workflow-error {
         err: string,
         code: code,
-    }
-
-    record history {
-        tasks-result: list<kvpair>
-    }
-
-    record signal {
-        payload: list<kvpair>
-    }
-
-    record workflow-info {
-        name: string,
-        version: string,
-        description: string,
     }
 }
