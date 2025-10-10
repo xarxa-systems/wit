@@ -1,10 +1,12 @@
-package xarxa:api@0.3.0;
+package xarxa:api@0.3.1;
 
 world orchestrator {
     export workflow-ctrl;
 
-    import logger;
     import custom-http;
+    import host-controller;
+    import logger;
+    
 }
 
 interface workflow-ctrl {
